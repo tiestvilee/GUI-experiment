@@ -10,8 +10,8 @@ namespace DowntoolsSvrExperiment.WizardControl
         private readonly IWizardView m_View;
         private readonly WizardPage m_FirstPage;
         private readonly Action m_FinishAction;
+        private readonly Stack<WizardPage> m_PreviousPages;
         private WizardPage m_CurrentPage;
-        private Stack<WizardPage> m_PreviousPages;
 
         public WizardViewModel(IWizardView view, WizardPage firstPage, Action finishAction)
         {
@@ -19,6 +19,9 @@ namespace DowntoolsSvrExperiment.WizardControl
             m_FirstPage = firstPage;
             m_FinishAction = finishAction;
             m_PreviousPages = new Stack<WizardPage>();
+
+            m_CurrentPage = m_FirstPage;
+            UpdateViewWithNewPage(m_CurrentPage);
         }
 
         public void Notify(object origin)
@@ -28,28 +31,20 @@ namespace DowntoolsSvrExperiment.WizardControl
 
         public void MoveToNextPage()
         {
-            if (m_CurrentPage == null)
+            if(!m_CurrentPage.ReadyToMove())
             {
-                m_CurrentPage = m_FirstPage;
-                UpdateViewWithNewPage(m_CurrentPage);
+                throw new NotReadyToProceedException();
+            }
+
+            if (m_CurrentPage.GetNextPage() == null)
+            {
+                m_FinishAction.Invoke();
             }
             else
             {
-                if(!m_CurrentPage.ReadyToMove())
-                {
-                    throw new NotReadyToProceedException();
-                }
-
                 m_PreviousPages.Push(m_CurrentPage);
-                if (m_CurrentPage.GetNextPage() == null)
-                {
-                    m_FinishAction.Invoke();
-                }
-                else
-                {
-                    m_CurrentPage = m_CurrentPage.GetNextPage();
-                    UpdateViewWithNewPage(m_CurrentPage);
-                }
+                m_CurrentPage = m_CurrentPage.GetNextPage();
+                UpdateViewWithNewPage(m_CurrentPage);
             }
         }
 

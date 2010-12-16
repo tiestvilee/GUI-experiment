@@ -21,23 +21,22 @@ namespace UnitTests
         [SetUp]
         public void SetUp()
         {
-            m_View = m_Mocks.PartialMock<StubbedView>();
+            m_View = new StubbedView(); // m_Mocks.PartialMock<StubbedView>();
             
             m_LastPageControl = m_Mocks.Stub<UserControl>();
-            m_LastPage = m_Mocks.PartialMock<StubbedPage>(m_LastPageControl, null, "Finish");
+            m_LastPage = new StubbedPage(m_LastPageControl, null, "Finish"); // m_Mocks.PartialMock<StubbedPage>(m_LastPageControl, null, "Finish");
 
             m_FirstPageControl = m_Mocks.Stub<UserControl>();
-            m_FirstPage = m_Mocks.PartialMock<StubbedPage>(m_FirstPageControl, m_LastPage, "Next");
+            m_FirstPage = new StubbedPage(m_FirstPageControl, m_LastPage, "Next"); // m_Mocks.PartialMock<StubbedPage>(m_FirstPageControl, m_LastPage, "Next");
         }
 
         [Test]
         public void ShouldMoveToFirstPageAndSetControl()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
 
             When();
-            wizardViewModel.MoveToNextPage();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
 
             Then();
             Assert.That(m_View.PageControl, Is.EqualTo(m_FirstPageControl));
@@ -47,11 +46,10 @@ namespace UnitTests
         public void ShouldMoveToFirstPageAndSetButtonState()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
             m_FirstPage.ReadyToMove(true);
 
             When();
-            wizardViewModel.MoveToNextPage();
+            new WizardViewModel(m_View, m_FirstPage, null);
 
             Then();
             Assert.That(m_View.BackButton, Is.False);
@@ -64,11 +62,10 @@ namespace UnitTests
         public void ShouldMoveToFirstPageAndSetNextButtonToDisabledWhenNotReadyToProceed()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
             m_FirstPage.ReadyToMove(false);
 
             When();
-            wizardViewModel.MoveToNextPage();
+            new WizardViewModel(m_View, m_FirstPage, null);
 
             Then();
             Assert.That(m_View.NextButton, Is.False);
@@ -82,7 +79,6 @@ namespace UnitTests
             m_LastPage.ReadyToMove(true);
 
             When();
-            wizardViewModel.MoveToNextPage();
             wizardViewModel.MoveToNextPage();
 
             Then();
@@ -103,7 +99,6 @@ namespace UnitTests
 
             When();
             wizardViewModel.MoveToNextPage();
-            wizardViewModel.MoveToNextPage();
 
             Then();
             Assert.That(m_View.NextButton, Is.False);
@@ -117,7 +112,6 @@ namespace UnitTests
             var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
 
             When();
-            wizardViewModel.MoveToNextPage();
             wizardViewModel.MoveToNextPage();
             wizardViewModel.MoveToPreviousPage();
 
@@ -138,7 +132,6 @@ namespace UnitTests
             var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, () => { clientWasCalled = true; });
 
             When();
-            wizardViewModel.MoveToNextPage();
             wizardViewModel.MoveToNextPage();
             wizardViewModel.MoveToNextPage();
 
@@ -173,7 +166,6 @@ namespace UnitTests
             When();
             try
             {
-                wizardViewModel.MoveToNextPage();
                 wizardViewModel.MoveToNextPage();
                 Assert.Fail("Should not get here");
             }
