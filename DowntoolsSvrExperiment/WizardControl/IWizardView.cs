@@ -7,7 +7,7 @@ namespace DowntoolsSvrExperiment.WizardControl
         void SetPage(UserControl pageControl);
         void EnableBackButton(bool b);
         void EnableNextButton(bool b);
-        void EnableFinishButton(bool b);
+        void SetNextButtonName(string name);
         void EnableCancelButton(bool b);
     }
 }

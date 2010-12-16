@@ -10,76 +10,124 @@ using Rhino.Mocks;
 namespace UnitTests
 {
     [TestFixture]
-    public class WizardViewModelTests
+    public class WizardViewModelTests : MockingBase
     {
-        MockRepository m_Mocks;
-        private IWizardView m_View;
-        private WizardPage m_FirstPage;
+        private StubbedView m_View;
+        private StubbedPage m_FirstPage;
         private UserControl m_FirstPageControl;
+        private StubbedPage m_LastPage;
+        private UserControl m_LastPageControl;
 
         [SetUp]
         public void SetUp()
         {
-            m_Mocks = new MockRepository();
-
             m_View = m_Mocks.PartialMock<StubbedView>();
+            
+            m_LastPageControl = m_Mocks.Stub<UserControl>();
+            m_LastPage = m_Mocks.PartialMock<StubbedPage>(m_LastPageControl, null, "Finish");
+
             m_FirstPageControl = m_Mocks.Stub<UserControl>();
-            m_FirstPage = m_Mocks.PartialMock<StubbedPage>(m_FirstPageControl);
-        }
-
-        public void Given()
-        {
-            // nothing
-        }
-
-        public void When()
-        {
-            m_Mocks.ReplayAll();
-        }
-
-        public void Then()
-        {
-            m_Mocks.VerifyAll();
+            m_FirstPage = m_Mocks.PartialMock<StubbedPage>(m_FirstPageControl, m_LastPage, "Next");
         }
 
         [Test]
-        public void ShouldSetupViewWithFirstPageControl()
+        public void ShouldMoveToFirstPageAndSetControl()
         {
             Given();
-            Expect.Call(() => m_View.SetPage(m_FirstPageControl));
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
 
             When();
-            new WizardViewModel(m_View, m_FirstPage);
+            wizardViewModel.MoveToNextPage();
 
             Then();
+            Assert.That(m_View.PageControl, Is.EqualTo(m_FirstPageControl));
         }
 
         [Test]
-        public void ShouldSetupButtonStateForFirstPage()
+        public void ShouldMoveToFirstPageAndSetButtonState()
         {
             Given();
-            Expect.Call(() => m_View.EnableBackButton(false));
-            Expect.Call(() => m_View.EnableNextButton(false));
-            Expect.Call(() => m_View.EnableFinishButton(false));
-            Expect.Call(() => m_View.EnableCancelButton(true));
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            m_FirstPage.ReadyToMove(true);
 
             When();
-            new WizardViewModel(m_View, m_FirstPage);
+            wizardViewModel.MoveToNextPage();
 
             Then();
+            Assert.That(m_View.BackButton, Is.False);
+            Assert.That(m_View.NextButton, Is.True);
+            Assert.That(m_View.NextButtonName, Is.EqualTo("Next"));
+            Assert.That(m_View.CancelButton, Is.True);
         }
 
         [Test]
-        public void ShouldSetupNextButtonIfPageReadyToMove()
+        public void ShouldMoveToFirstPageAndSetNextButtonToDisabledWhenNotReadyToProceed()
         {
             Given();
-            Expect.Call(m_FirstPage.ReadyToMove()).Return(true);
-            Expect.Call(() => m_View.EnableNextButton(true));
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            m_FirstPage.ReadyToMove(false);
 
             When();
-            new WizardViewModel(m_View, m_FirstPage);
+            wizardViewModel.MoveToNextPage();
 
             Then();
+            Assert.That(m_View.NextButton, Is.False);
+        }
+
+        [Test]
+        public void ShouldMoveToSecondPageAndSetBackToEnabledAndNextButtonToFinishedWhenReadyToProceed()
+        {
+            Given();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            m_LastPage.ReadyToMove(true);
+
+            When();
+            wizardViewModel.MoveToNextPage();
+            wizardViewModel.MoveToNextPage();
+
+            Then();
+            Assert.That(m_View.PageControl, Is.EqualTo(m_LastPageControl));
+
+            Assert.That(m_View.BackButton, Is.True);
+            Assert.That(m_View.NextButton, Is.True);
+            Assert.That(m_View.NextButtonName, Is.EqualTo("Finish"));
+            Assert.That(m_View.CancelButton, Is.True);
+        }
+
+        [Test]
+        public void ShouldMoveToSecondPageAndSetFinishButtonToDisabledWhenNotReadyToProceed()
+        {
+            Given();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            m_LastPage.ReadyToMove(false);
+
+            When();
+            wizardViewModel.MoveToNextPage();
+            wizardViewModel.MoveToNextPage();
+
+            Then();
+            Assert.That(m_View.NextButton, Is.False);
+            Assert.That(m_View.NextButtonName, Is.EqualTo("Finish"));
+        }
+
+        [Test]
+        public void ShouldMoveBackFromSecondToFirstPage()
+        {
+            Given();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+
+            When();
+            wizardViewModel.MoveToNextPage();
+            wizardViewModel.MoveToNextPage();
+            wizardViewModel.MoveToPreviousPage();
+
+            Then();
+            Assert.That(m_View.PageControl, Is.EqualTo(m_FirstPageControl));
+
+            Assert.That(m_View.BackButton, Is.False);
+            Assert.That(m_View.NextButton, Is.True);
+            Assert.That(m_View.NextButtonName, Is.EqualTo("Next"));
+            Assert.That(m_View.CancelButton, Is.True);
         }
 
         [Test]
@@ -110,40 +158,51 @@ namespace UnitTests
 
     public class StubbedView : IWizardView
     {
+        public UserControl PageControl;
+        public bool BackButton;
+        public bool NextButton;
+        public string NextButtonName;
+        public bool CancelButton;
+
         public virtual void SetPage(UserControl pageControl)
-        { 
-            // do nothing
+        {
+            PageControl = pageControl;
         }
 
         public virtual void EnableBackButton(bool b)
         {
-            // do nothing
+            BackButton = b;
         }
 
         public virtual void EnableNextButton(bool b)
         {
-            // do nothing
+            NextButton = b;
         }
 
-        public virtual void EnableFinishButton(bool b)
+        public void SetNextButtonName(string name)
         {
-            // do nothing
+            NextButtonName = name;
         }
 
         public virtual void EnableCancelButton(bool b)
         {
-            // do nothing
+            CancelButton = b;
         }
     }
 
     public class StubbedPage : WizardPage
     {
         private readonly UserControl m_Control;
+        private readonly WizardPage m_Next;
+        private readonly string m_NextButtonText;
         List<ChangeListener> listeners = new List<ChangeListener>();
+        private bool m_ReadyToMove = true;
 
-        public StubbedPage(UserControl control)
+        public StubbedPage(UserControl control, WizardPage next, string nextButtonText)
         {
             m_Control = control;
+            m_Next = next;
+            m_NextButtonText = nextButtonText;
         }
 
         public virtual UserControl GetControl()
@@ -163,7 +222,22 @@ namespace UnitTests
 
         public virtual bool ReadyToMove()
         {
-            return false;
+            return m_ReadyToMove;
+        }
+
+        public void ReadyToMove(bool value)
+        {
+            m_ReadyToMove = value;
+        }
+
+        public WizardPage GetNextPage()
+        {
+            return m_Next;
+        }
+
+        public string GetNextButtonText()
+        {
+            return m_NextButtonText;
         }
     }
 }

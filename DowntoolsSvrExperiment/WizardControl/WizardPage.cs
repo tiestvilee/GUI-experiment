@@ -12,5 +12,7 @@ namespace DowntoolsSvrExperiment.WizardControl
         void AddChangeListener(ChangeListener listener);
         void FireChangeEvent();
         bool ReadyToMove();
+        WizardPage GetNextPage();
+        string GetNextButtonText();
     }
 }

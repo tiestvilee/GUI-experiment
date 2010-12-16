@@ -9,23 +9,56 @@ namespace DowntoolsSvrExperiment.WizardControl
     {
         private readonly IWizardView m_View;
         private readonly WizardPage m_FirstPage;
+        private WizardPage m_CurrentPage;
+        private Stack<WizardPage> m_PreviousPages;
 
         public WizardViewModel(IWizardView view, WizardPage firstPage)
         {
             m_View = view;
             m_FirstPage = firstPage;
-
-            view.SetPage(firstPage.GetControl());
-            m_View.EnableBackButton(false);
-            m_View.EnableNextButton(false);
-            m_View.EnableFinishButton(false);
-            m_View.EnableCancelButton(true);
-            firstPage.AddChangeListener(this);
+            m_PreviousPages = new Stack<WizardPage>();
         }
 
         public void Notify(object origin)
         {
             throw new NotImplementedException();
+        }
+
+        public void MoveToNextPage()
+        {
+            IncrementCurrentPage();
+
+            UpdateViewWithNewPage(m_CurrentPage);
+        }
+
+        private void IncrementCurrentPage()
+        {
+            if (m_CurrentPage == null)
+            {
+                m_CurrentPage = m_FirstPage;
+            }
+            else
+            {
+                m_PreviousPages.Push(m_CurrentPage);
+                m_CurrentPage = m_CurrentPage.GetNextPage();
+            }
+        }
+
+        public void MoveToPreviousPage()
+        {
+            m_CurrentPage = m_PreviousPages.Pop();
+
+            UpdateViewWithNewPage(m_CurrentPage);
+        }
+
+        private void UpdateViewWithNewPage(WizardPage newPage)
+        {
+            m_View.SetPage(newPage.GetControl());
+            m_View.EnableBackButton(newPage != m_FirstPage);
+            m_View.EnableNextButton(newPage.ReadyToMove());
+            m_View.SetNextButtonName(newPage.GetNextButtonText());
+            m_View.EnableCancelButton(true);
+            m_CurrentPage.AddChangeListener(this);
         }
     }
 }
