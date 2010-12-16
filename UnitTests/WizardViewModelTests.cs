@@ -34,7 +34,7 @@ namespace UnitTests
         public void ShouldMoveToFirstPageAndSetControl()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
 
             When();
             wizardViewModel.MoveToNextPage();
@@ -47,7 +47,7 @@ namespace UnitTests
         public void ShouldMoveToFirstPageAndSetButtonState()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
             m_FirstPage.ReadyToMove(true);
 
             When();
@@ -64,7 +64,7 @@ namespace UnitTests
         public void ShouldMoveToFirstPageAndSetNextButtonToDisabledWhenNotReadyToProceed()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
             m_FirstPage.ReadyToMove(false);
 
             When();
@@ -78,7 +78,7 @@ namespace UnitTests
         public void ShouldMoveToSecondPageAndSetBackToEnabledAndNextButtonToFinishedWhenReadyToProceed()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
             m_LastPage.ReadyToMove(true);
 
             When();
@@ -98,7 +98,7 @@ namespace UnitTests
         public void ShouldMoveToSecondPageAndSetFinishButtonToDisabledWhenNotReadyToProceed()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
             m_LastPage.ReadyToMove(false);
 
             When();
@@ -114,7 +114,7 @@ namespace UnitTests
         public void ShouldMoveBackFromSecondToFirstPage()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
 
             When();
             wizardViewModel.MoveToNextPage();
@@ -131,13 +131,66 @@ namespace UnitTests
         }
 
         [Test]
+        public void ShouldInformClientWhenFinished()
+        {
+            Given();
+            Boolean clientWasCalled = false;
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, () => { clientWasCalled = true; });
+
+            When();
+            wizardViewModel.MoveToNextPage();
+            wizardViewModel.MoveToNextPage();
+            wizardViewModel.MoveToNextPage();
+
+            Then();
+            Assert.That(clientWasCalled, Is.True);
+        }
+
+        [Test]
+        public void ShouldNotAllowMovingBeforeFirstPage()
+        {
+            Given();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+
+            When();
+            try
+            {
+                wizardViewModel.MoveToPreviousPage();
+                Assert.Fail("Should not get here");
+            } catch(MoveBeforeFirstPageException e)
+            {
+                Then();
+            }
+        }
+
+        [Test]
+        public void ShouldNotAllowMovingIfNotReadyToProceed()
+        {
+            Given();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            m_FirstPage.ReadyToMove(false);
+
+            When();
+            try
+            {
+                wizardViewModel.MoveToNextPage();
+                wizardViewModel.MoveToNextPage();
+                Assert.Fail("Should not get here");
+            }
+            catch (NotReadyToProceedException e)
+            {
+                Then();
+            }
+        }
+
+        [Test]
         public void ShouldSetupListeningForChangesOnPage()
         {
             Given();
             //Expect.Call()
 
             When();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
 
             Then();
             m_FirstPage.AssertWasCalled(x => x.AddChangeListener(wizardViewModel));
@@ -147,7 +200,7 @@ namespace UnitTests
         public void ShouldUpdateNextButtonStateWhenPageChangesState()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
 
             When();
             wizardViewModel.Notify(m_FirstPage);
