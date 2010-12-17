@@ -24,10 +24,10 @@ namespace UnitTests
             m_View = new StubbedView(); // m_Mocks.PartialMock<StubbedView>();
             
             m_LastPageControl = m_Mocks.Stub<UserControl>();
-            m_LastPage = new StubbedPage(m_LastPageControl, null, "Finish"); // m_Mocks.PartialMock<StubbedPage>(m_LastPageControl, null, "Finish");
+            m_LastPage = new StubbedPage(m_LastPageControl, null, "Finish", "Last Page"); // m_Mocks.PartialMock<StubbedPage>(m_LastPageControl, null, "Finish");
 
             m_FirstPageControl = m_Mocks.Stub<UserControl>();
-            m_FirstPage = new StubbedPage(m_FirstPageControl, m_LastPage, "Next"); // m_Mocks.PartialMock<StubbedPage>(m_FirstPageControl, m_LastPage, "Next");
+            m_FirstPage = new StubbedPage(m_FirstPageControl, m_LastPage, "Next", "First Page"); // m_Mocks.PartialMock<StubbedPage>(m_FirstPageControl, m_LastPage, "Next");
         }
 
         [Test]
@@ -36,10 +36,11 @@ namespace UnitTests
             Given();
 
             When();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            new WizardViewModel(m_View, m_FirstPage, null);
 
             Then();
             Assert.That(m_View.PageControl, Is.EqualTo(m_FirstPageControl));
+            Assert.That(m_View.PageName, Is.EqualTo("Step 1 of 2: First Page"));
         }
 
         [Test]
@@ -176,42 +177,103 @@ namespace UnitTests
         }
 
         [Test]
-        public void ShouldSetupListeningForChangesOnPage()
+        public void ShouldRegisterForPageChangesAndUpdateStateOfNextButtonWhenPageChanges()
         {
             Given();
-            //Expect.Call()
+            m_FirstPage.ReadyToMove(false);
+            new WizardViewModel(m_View, m_FirstPage, null);
+            Assert.That(m_View.NextButton, Is.False);
 
             When();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            m_FirstPage.ReadyToMove(true);
+            m_FirstPage.RaiseOnChangeDoAction();
 
             Then();
-            m_FirstPage.AssertWasCalled(x => x.AddChangeListener(wizardViewModel));
+            Assert.That(m_View.NextButton, Is.True);
         }
 
         [Test]
-        public void ShouldUpdateNextButtonStateWhenPageChangesState()
+        public void ShouldUpdateStateOfFinishButtonWhenFinalPageChanges()
         {
             Given();
             var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
 
+            m_LastPage.ReadyToMove(false);
+            wizardViewModel.MoveToNextPage();
+
+            Assert.That(m_View.NextButton, Is.False);
+
             When();
-            wizardViewModel.Notify(m_FirstPage);
+            m_LastPage.ReadyToMove(true);
+            m_LastPage.RaiseOnChangeDoAction();
 
             Then();
+            Assert.That(m_View.NextButton, Is.True);
+        }
+
+        [Test]
+        public void WhenOnFinalPageAndFirstPageChangesThenFinishButtonShouldNotChange()
+        {
+            Given();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+
+            m_LastPage.ReadyToMove(false);
+            wizardViewModel.MoveToNextPage();
+
+            Assert.That(m_View.NextButton, Is.False);
+
+            When();
+            m_FirstPage.ReadyToMove(true);
+            m_FirstPage.RaiseOnChangeDoAction();
+
+            Then();
+            Assert.That(m_View.NextButton, Is.False);
+        }
+
+        [Test]
+        public void ShouldUpdateViewWithPageList()
+        {
+            Given();
+
+            When();
+            new WizardViewModel(m_View, m_FirstPage, null);
+
+            Then();
+            Assert.That(m_View.PageList[0].Name, Is.EqualTo("First Page"));
+            Assert.That(m_View.PageList[0].CurrentPage, Is.True);
+            Assert.That(m_View.PageList[1].Name, Is.EqualTo("Last Page"));
+            Assert.That(m_View.PageList[1].CurrentPage, Is.False);
+        }
+
+        [Test]
+        public void ShouldHighlightSecondPageInListAfterMoving()
+        {
+            Given();
+
+            When();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            wizardViewModel.MoveToNextPage();
+
+            Then();
+            Assert.That(m_View.PageList[0].CurrentPage, Is.False);
+            Assert.That(m_View.PageList[1].CurrentPage, Is.True);
         }
     }
 
-    public class StubbedView : IWizardView
+    public class StubbedView : WizardView
     {
         public UserControl PageControl;
+        public string PageName;
         public bool BackButton;
         public bool NextButton;
         public string NextButtonName;
         public bool CancelButton;
+        public List<PageNameAndCurrent> PageList;
 
-        public virtual void SetPage(UserControl pageControl)
+        public virtual void SetPage(UserControl pageControl, string pageName)
         {
             PageControl = pageControl;
+            PageName = pageName;
         }
 
         public virtual void EnableBackButton(bool b)
@@ -233,6 +295,11 @@ namespace UnitTests
         {
             CancelButton = b;
         }
+
+        public void SetPageList(List<PageNameAndCurrent> pages)
+        {
+            PageList = pages;
+        }
     }
 
     public class StubbedPage : WizardPage
@@ -240,14 +307,16 @@ namespace UnitTests
         private readonly UserControl m_Control;
         private readonly WizardPage m_Next;
         private readonly string m_NextButtonText;
-        List<ChangeListener> listeners = new List<ChangeListener>();
         private bool m_ReadyToMove = true;
+        public Action OnChangeAction;
+        private string m_Name;
 
-        public StubbedPage(UserControl control, WizardPage next, string nextButtonText)
+        public StubbedPage(UserControl control, WizardPage next, string nextButtonText, string pageName)
         {
             m_Control = control;
             m_Next = next;
             m_NextButtonText = nextButtonText;
+            m_Name = pageName;
         }
 
         public virtual UserControl GetControl()
@@ -255,14 +324,9 @@ namespace UnitTests
             return m_Control;
         }
 
-        public virtual void AddChangeListener(ChangeListener changeListener)
+        public void OnChangeDo(Action onChangeAction)
         {
-            listeners.Add(changeListener);
-        }
-
-        public virtual void FireChangeEvent()
-        {
-            throw new NotImplementedException();
+            OnChangeAction = onChangeAction;
         }
 
         public virtual bool ReadyToMove()
@@ -283,6 +347,16 @@ namespace UnitTests
         public string GetNextButtonText()
         {
             return m_NextButtonText;
+        }
+
+        public string getName()
+        {
+            return m_Name;
+        }
+
+        public void RaiseOnChangeDoAction()
+        {
+            OnChangeAction.Invoke();
         }
     }
 }

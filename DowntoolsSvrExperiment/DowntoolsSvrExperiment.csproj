@@ -61,8 +61,14 @@
       <DependentUpon>UserControl1.cs</DependentUpon>
     </Compile>
     <Compile Include="WizardControl\ChangeListener.cs" />
-    <Compile Include="WizardControl\IWizardView.cs" />
+    <Compile Include="WizardControl\WizardView.cs" />
     <Compile Include="WizardControl\Exceptions.cs" />
+    <Compile Include="WizardControl\WizardViewControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WizardControl\WizardViewControl.Designer.cs">
+      <DependentUpon>WizardViewControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="WizardControl\WizardViewModel.cs" />
     <Compile Include="WizardControl\WizardPage.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -74,6 +80,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="WizardControl\WizardViewControl.resx">
+      <DependentUpon>WizardViewControl.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

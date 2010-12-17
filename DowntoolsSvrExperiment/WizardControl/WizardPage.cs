@@ -9,10 +9,10 @@ namespace DowntoolsSvrExperiment.WizardControl
     public interface WizardPage
     {
         UserControl GetControl();
-        void AddChangeListener(ChangeListener listener);
-        void FireChangeEvent();
+        void OnChangeDo(Action onChangeAction);
         bool ReadyToMove();
         WizardPage GetNextPage();
         string GetNextButtonText();
+        string getName();
     }
 }
