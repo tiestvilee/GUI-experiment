@@ -1,6 +1,6 @@
 ﻿namespace DowntoolsSvrExperiment.WizardControl
 {
-    partial class WizardViewControl
+    partial class WizardViewWidget
     {
         /// <summary> 
         /// Required designer variable.
@@ -101,7 +101,6 @@
             this.m_CancelButton.TabIndex = 0;
             this.m_CancelButton.Text = "Cancel";
             this.m_CancelButton.UseVisualStyleBackColor = true;
-            this.m_CancelButton.Click += new System.EventHandler(this.m_CancelButton_Click);
             // 
             // m_NextButton
             // 
@@ -111,7 +110,6 @@
             this.m_NextButton.TabIndex = 1;
             this.m_NextButton.Text = "Next";
             this.m_NextButton.UseVisualStyleBackColor = true;
-            this.m_NextButton.Click += new System.EventHandler(this.m_NextButton_Click);
             // 
             // m_PreviousButton
             // 
@@ -121,7 +119,6 @@
             this.m_PreviousButton.TabIndex = 2;
             this.m_PreviousButton.Text = "Previous";
             this.m_PreviousButton.UseVisualStyleBackColor = true;
-            this.m_PreviousButton.Click += new System.EventHandler(this.m_PreviousButton_Click);
             // 
             // panel1
             // 

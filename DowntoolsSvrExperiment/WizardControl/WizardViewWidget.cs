@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace DowntoolsSvrExperiment.WizardControl
 {
-    public partial class WizardViewControl : UserControl, WizardView
+    public partial class WizardViewWidget : UserControl, WizardView
     {
-        public WizardViewControl()
+        public WizardViewWidget()
         {
             InitializeComponent();
         }
@@ -78,19 +78,19 @@ namespace DowntoolsSvrExperiment.WizardControl
             }
         }
 
-        private void m_PreviousButton_Click(object sender, EventArgs e)
+        public void OnCancelDo(Action cancelAction)
         {
-
+            m_CancelButton.Click += (o, e) => { cancelAction(); };
         }
 
-        private void m_NextButton_Click(object sender, EventArgs e)
+        public void OnNextDo(Action nextButtonAction)
         {
-
+            m_NextButton.Click += (o, e) => { nextButtonAction(); };
         }
 
-        private void m_CancelButton_Click(object sender, EventArgs e)
+        public void OnPreviousDo(Action previousButtonAction)
         {
-
+            m_PreviousButton.Click += (o, e) => { previousButtonAction(); };
         }
     }
 }

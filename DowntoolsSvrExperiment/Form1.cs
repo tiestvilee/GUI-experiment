@@ -16,10 +16,10 @@ namespace DowntoolsSvrExperiment
         {
             InitializeComponent();
 
-            var wizardView = new WizardViewControl();
+            var wizardView = new WizardViewWidget();
             var secondPage = new PageExample(null, "second page");
             var firstPage = new PageExample(secondPage, "first page");
-            new WizardViewModel(wizardView, firstPage, cancel);
+            new WizardViewModel(wizardView, firstPage, cancel, cancel);
 
             Controls.Add(wizardView);
         }
@@ -43,7 +43,7 @@ namespace DowntoolsSvrExperiment
 
         public UserControl GetControl()
         {
-            return new ExamplePageUserControl();
+            return new ExamplePageUserWidget();
         }
 
         public void OnChangeDo(Action onChangeAction)
@@ -52,7 +52,7 @@ namespace DowntoolsSvrExperiment
 
         public bool ReadyToMove()
         {
-            return false;
+            return true;
         }
 
         public WizardPage GetNextPage()

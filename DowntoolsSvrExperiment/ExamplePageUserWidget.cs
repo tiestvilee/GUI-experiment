@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace DowntoolsSvrExperiment
 {
-    public partial class ExamplePageUserControl : UserControl
+    public partial class ExamplePageUserWidget : UserControl
     {
-        public ExamplePageUserControl()
+        public ExamplePageUserWidget()
         {
             InitializeComponent();
         }

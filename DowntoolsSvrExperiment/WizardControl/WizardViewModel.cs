@@ -13,12 +13,16 @@ namespace DowntoolsSvrExperiment.WizardControl
         private readonly Stack<WizardPage> m_PreviousPages;
         private WizardPage m_CurrentPage;
 
-        public WizardViewModel(WizardView view, WizardPage firstPage, Action finishAction)
+        public WizardViewModel(WizardView view, WizardPage firstPage, Action finishAction, Action cancelAction)
         {
             m_View = view;
             m_FirstPage = firstPage;
             m_FinishAction = finishAction;
             m_PreviousPages = new Stack<WizardPage>();
+
+            m_View.OnCancelDo(cancelAction);
+            m_View.OnNextDo(MoveToNextPage);
+            m_View.OnPreviousDo(MoveToPreviousPage);
 
             m_CurrentPage = m_FirstPage;
             UpdateViewWithNewPage(m_CurrentPage);

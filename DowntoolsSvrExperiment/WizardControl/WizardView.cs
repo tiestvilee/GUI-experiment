@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace DowntoolsSvrExperiment.WizardControl
@@ -11,6 +12,9 @@ namespace DowntoolsSvrExperiment.WizardControl
         void SetNextButtonName(string name);
         void EnableCancelButton(bool b);
         void SetPageList(List<PageNameAndCurrent> pages);
+        void OnCancelDo(Action cancelAction);
+        void OnNextDo(Action nextButtonAction);
+        void OnPreviousDo(Action previousButtonAction);
     }
 
     public struct PageNameAndCurrent

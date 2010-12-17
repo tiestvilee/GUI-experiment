@@ -31,12 +31,27 @@ namespace UnitTests
         }
 
         [Test]
+        public void ShouldRegisterListenersOnWizardControl()
+        {
+            Given();
+            Action cancelAction = () => { };
+
+            When();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, cancelAction);
+
+            Then();
+            Assert.That(m_View.CancelButtonAction, Is.EqualTo(cancelAction));
+            Assert.That(m_View.NextButtonAction, Is.EqualTo(new Action(wizardViewModel.MoveToNextPage)));
+            Assert.That(m_View.PreviousButtonAction, Is.EqualTo(new Action(wizardViewModel.MoveToPreviousPage)));
+        }
+
+        [Test]
         public void ShouldMoveToFirstPageAndSetControl()
         {
             Given();
 
             When();
-            new WizardViewModel(m_View, m_FirstPage, null);
+            new WizardViewModel(m_View, m_FirstPage, null, null);
 
             Then();
             Assert.That(m_View.PageControl, Is.EqualTo(m_FirstPageControl));
@@ -50,7 +65,7 @@ namespace UnitTests
             m_FirstPage.ReadyToMove(true);
 
             When();
-            new WizardViewModel(m_View, m_FirstPage, null);
+            new WizardViewModel(m_View, m_FirstPage, null, null);
 
             Then();
             Assert.That(m_View.BackButton, Is.False);
@@ -66,7 +81,7 @@ namespace UnitTests
             m_FirstPage.ReadyToMove(false);
 
             When();
-            new WizardViewModel(m_View, m_FirstPage, null);
+            new WizardViewModel(m_View, m_FirstPage, null, null);
 
             Then();
             Assert.That(m_View.NextButton, Is.False);
@@ -76,7 +91,7 @@ namespace UnitTests
         public void ShouldMoveToSecondPageAndSetControl()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
 
             When();
             wizardViewModel.MoveToNextPage();
@@ -90,7 +105,7 @@ namespace UnitTests
         public void ShouldMoveToSecondPageAndSetBackToEnabledAndNextButtonToFinishedWhenReadyToProceed()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
             m_LastPage.ReadyToMove(true);
 
             When();
@@ -109,7 +124,7 @@ namespace UnitTests
         public void ShouldMoveToSecondPageAndSetFinishButtonToDisabledWhenNotReadyToProceed()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
             m_LastPage.ReadyToMove(false);
 
             When();
@@ -124,7 +139,7 @@ namespace UnitTests
         public void ShouldMoveBackFromSecondToFirstPage()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
 
             When();
             wizardViewModel.MoveToNextPage();
@@ -144,7 +159,7 @@ namespace UnitTests
         {
             Given();
             Boolean clientWasCalled = false;
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, () => { clientWasCalled = true; });
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, () => { clientWasCalled = true; }, null);
 
             When();
             wizardViewModel.MoveToNextPage();
@@ -158,7 +173,7 @@ namespace UnitTests
         public void ShouldNotAllowMovingBeforeFirstPage()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
 
             When();
             try
@@ -175,7 +190,7 @@ namespace UnitTests
         public void ShouldNotAllowMovingIfNotReadyToProceed()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
             m_FirstPage.ReadyToMove(false);
 
             When();
@@ -195,7 +210,7 @@ namespace UnitTests
         {
             Given();
             m_FirstPage.ReadyToMove(false);
-            new WizardViewModel(m_View, m_FirstPage, null);
+            new WizardViewModel(m_View, m_FirstPage, null, null);
             Assert.That(m_View.NextButton, Is.False);
 
             When();
@@ -210,7 +225,7 @@ namespace UnitTests
         public void ShouldUpdateStateOfFinishButtonWhenFinalPageChanges()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
 
             m_LastPage.ReadyToMove(false);
             wizardViewModel.MoveToNextPage();
@@ -229,7 +244,7 @@ namespace UnitTests
         public void WhenOnFinalPageAndFirstPageChangesThenFinishButtonShouldNotChange()
         {
             Given();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
 
             m_LastPage.ReadyToMove(false);
             wizardViewModel.MoveToNextPage();
@@ -250,7 +265,7 @@ namespace UnitTests
             Given();
 
             When();
-            new WizardViewModel(m_View, m_FirstPage, null);
+            new WizardViewModel(m_View, m_FirstPage, null, null);
 
             Then();
             Assert.That(m_View.PageList[0].Name, Is.EqualTo("First Page"));
@@ -265,7 +280,7 @@ namespace UnitTests
             Given();
 
             When();
-            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
             wizardViewModel.MoveToNextPage();
 
             Then();
@@ -283,6 +298,9 @@ namespace UnitTests
         public string NextButtonName;
         public bool CancelButton;
         public List<PageNameAndCurrent> PageList;
+        public Action CancelButtonAction;
+        public Action NextButtonAction;
+        public Action PreviousButtonAction;
 
         public virtual void SetPage(UserControl pageControl, string pageName)
         {
@@ -313,6 +331,21 @@ namespace UnitTests
         public void SetPageList(List<PageNameAndCurrent> pages)
         {
             PageList = pages;
+        }
+
+        public void OnCancelDo(Action cancelAction)
+        {
+            CancelButtonAction = cancelAction;
+        }
+
+        public void OnNextDo(Action nextButtonAction)
+        {
+            NextButtonAction = nextButtonAction;
+        }
+
+        public void OnPreviousDo(Action previousButtonAction)
+        {
+            PreviousButtonAction = previousButtonAction;
         }
     }
 

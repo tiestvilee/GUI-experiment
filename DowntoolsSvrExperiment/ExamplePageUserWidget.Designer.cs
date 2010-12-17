@@ -1,6 +1,6 @@
 ﻿namespace DowntoolsSvrExperiment
 {
-    partial class ExamplePageUserControl
+    partial class ExamplePageUserWidget
     {
         /// <summary> 
         /// Required designer variable.
