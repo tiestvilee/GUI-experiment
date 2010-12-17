@@ -73,6 +73,20 @@ namespace UnitTests
         }
 
         [Test]
+        public void ShouldMoveToSecondPageAndSetControl()
+        {
+            Given();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null);
+
+            When();
+            wizardViewModel.MoveToNextPage();
+
+            Then();
+            Assert.That(m_View.PageControl, Is.EqualTo(m_LastPageControl));
+            Assert.That(m_View.PageName, Is.EqualTo("Step 2 of 2: Last Page"));
+        }
+
+        [Test]
         public void ShouldMoveToSecondPageAndSetBackToEnabledAndNextButtonToFinishedWhenReadyToProceed()
         {
             Given();
