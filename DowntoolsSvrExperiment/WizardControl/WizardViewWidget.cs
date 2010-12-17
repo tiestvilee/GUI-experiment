@@ -68,8 +68,6 @@ namespace DowntoolsSvrExperiment.WizardControl
                     label.Margin = new Padding(3,3,3,3);
                     label.Tag = pageNameAndCurrent; // ?? 
                     m_PageList.Controls.Add(label);
-                    label.Dock = DockStyle.Top;
-                    label.BringToFront(); /* fix up z-order */
                 }
             }
             finally

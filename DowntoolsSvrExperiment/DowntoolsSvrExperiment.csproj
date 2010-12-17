@@ -46,11 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExamplePageUserControl.cs">
+    <Compile Include="ExamplePageUserWidget.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ExamplePageUserControl.Designer.cs">
-      <DependentUpon>ExamplePageUserControl.cs</DependentUpon>
+    <Compile Include="ExamplePageUserWidget.Designer.cs">
+      <DependentUpon>ExamplePageUserWidget.cs</DependentUpon>
     </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -69,16 +69,16 @@
     <Compile Include="WizardControl\ChangeListener.cs" />
     <Compile Include="WizardControl\WizardView.cs" />
     <Compile Include="WizardControl\Exceptions.cs" />
-    <Compile Include="WizardControl\WizardViewControl.cs">
+    <Compile Include="WizardControl\WizardViewWidget.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="WizardControl\WizardViewControl.Designer.cs">
-      <DependentUpon>WizardViewControl.cs</DependentUpon>
+    <Compile Include="WizardControl\WizardViewWidget.Designer.cs">
+      <DependentUpon>WizardViewWidget.cs</DependentUpon>
     </Compile>
     <Compile Include="WizardControl\WizardViewModel.cs" />
     <Compile Include="WizardControl\WizardPage.cs" />
-    <EmbeddedResource Include="ExamplePageUserControl.resx">
-      <DependentUpon>ExamplePageUserControl.cs</DependentUpon>
+    <EmbeddedResource Include="ExamplePageUserWidget.resx">
+      <DependentUpon>ExamplePageUserWidget.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -92,8 +92,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="WizardControl\WizardViewControl.resx">
-      <DependentUpon>WizardViewControl.cs</DependentUpon>
+    <EmbeddedResource Include="WizardControl\WizardViewWidget.resx">
+      <DependentUpon>WizardViewWidget.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
