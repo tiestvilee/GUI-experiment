@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DowntoolsSvrExperiment.VRPages.IntroPage;
 using DowntoolsSvrExperiment.WizardControl;
 
 namespace DowntoolsSvrExperiment
@@ -19,7 +20,8 @@ namespace DowntoolsSvrExperiment
             var wizardView = new WizardViewWidget();
             var secondPage = new PageExample(null, "second page");
             var firstPage = new PageExample(secondPage, "first page");
-            new WizardViewModel(wizardView, firstPage, cancel, cancel);
+            var introPage = new IntroPage(new IntroPageWidget(), firstPage);
+            new WizardViewModel(wizardView, introPage, cancel, cancel);
 
             Controls.Add(wizardView);
         }

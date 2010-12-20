@@ -37,6 +37,9 @@
             this.m_NextButton = new System.Windows.Forms.Button();
             this.m_CancelButton = new System.Windows.Forms.Button();
             this.m_PageName = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.m_PageList.SuspendLayout();
             this.m_ButtonPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -51,6 +54,8 @@
             // m_PageList
             // 
             this.m_PageList.BackColor = System.Drawing.Color.Transparent;
+            this.m_PageList.Controls.Add(this.label1);
+            this.m_PageList.Controls.Add(this.label2);
             this.m_PageList.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.m_PageList.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_PageList.ForeColor = System.Drawing.SystemColors.GrayText;
@@ -131,6 +136,24 @@
             this.m_PageName.Text = "label1";
             this.m_PageName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(41, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "label1";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(3, 13);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(41, 13);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "label2";
+            // 
             // WizardViewWidget
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -143,6 +166,8 @@
             this.Controls.Add(this.m_Page);
             this.Name = "WizardViewWidget";
             this.Size = new System.Drawing.Size(480, 436);
+            this.m_PageList.ResumeLayout(false);
+            this.m_PageList.PerformLayout();
             this.m_ButtonPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -159,5 +184,7 @@
         private System.Windows.Forms.Button m_CancelButton;
         private System.Windows.Forms.Panel m_BottomBorderPanel;
         private System.Windows.Forms.FlowLayoutPanel m_PageList;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }

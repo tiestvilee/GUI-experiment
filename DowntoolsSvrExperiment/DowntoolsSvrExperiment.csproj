@@ -66,6 +66,13 @@
     <Compile Include="UserControl1.Designer.cs">
       <DependentUpon>UserControl1.cs</DependentUpon>
     </Compile>
+    <Compile Include="VRPages\IntroPage\IntroPage.cs" />
+    <Compile Include="VRPages\IntroPage\IntroPageWidget.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VRPages\IntroPage\IntroPageWidget.Designer.cs">
+      <DependentUpon>IntroPageWidget.cs</DependentUpon>
+    </Compile>
     <Compile Include="WizardControl\ChangeListener.cs" />
     <Compile Include="WizardControl\WizardView.cs" />
     <Compile Include="WizardControl\Exceptions.cs" />
@@ -92,6 +99,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="VRPages\IntroPage\IntroPageWidget.resx">
+      <DependentUpon>IntroPageWidget.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="WizardControl\WizardViewWidget.resx">
       <DependentUpon>WizardViewWidget.cs</DependentUpon>
     </EmbeddedResource>
@@ -104,6 +114,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="VRPages\LocalServerPicker\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

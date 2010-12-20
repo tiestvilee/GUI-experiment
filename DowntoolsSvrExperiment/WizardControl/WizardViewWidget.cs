@@ -63,11 +63,14 @@ namespace DowntoolsSvrExperiment.WizardControl
                 foreach (var pageNameAndCurrent in pages)
                 {
                     var label = new Label();
+
+                    m_PageList.Controls.Add(label);
+
+                    label.AutoSize = true;
+                    label.TabIndex = 0;
                     label.Text = pageNameAndCurrent.Name;
                     label.ForeColor = pageNameAndCurrent.CurrentPage ? Color.Black : SystemColors.GrayText;
-                    label.Margin = new Padding(3,3,3,3);
-                    label.Tag = pageNameAndCurrent; // ?? 
-                    m_PageList.Controls.Add(label);
+
                 }
             }
             finally
