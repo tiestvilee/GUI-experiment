@@ -19,7 +19,7 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
 
         public override UserControl GetControl()
         {
-            return m_View.getControl();
+            return m_View.GetControl();
         }
 
         public override void OnChangeDo(Action onChangeAction)
@@ -52,7 +52,16 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
 
         public override void PostValidate(Action andThen)
         {
-            andThen();
+            var connection = new Connection.Connection(
+                m_View.GetInstance(), 
+                m_View.GetSecurityType(), 
+                m_View.GetUserName(), 
+                m_View.GetPassword());
+            var status = m_TestConnection.Test(connection);
+            if(status.Connected)
+            {
+                andThen();
+            }
         }
     }
 }

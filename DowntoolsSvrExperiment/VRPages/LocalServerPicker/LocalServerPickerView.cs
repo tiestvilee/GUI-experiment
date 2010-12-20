@@ -4,10 +4,11 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
 {
     public interface LocalServerPickerView
     {
-        UserControl getControl();
+        UserControl GetControl();
         string GetInstance();
         SecurityType GetSecurityType();
         string GetUserName();
+        string GetPassword();
     }
 
     public enum SecurityType

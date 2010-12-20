@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="LocalServerPickerPageTests.cs" />
     <Compile Include="MockingBase.cs" />
+    <Compile Include="StubbedPage.cs" />
     <Compile Include="WizardViewModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -48,5 +48,19 @@ namespace DowntoolsSvrExperiment.Connection
             return builder.ToString();
         }
 
+        public override bool Equals(object o)
+        {
+            var other = o as Connection;
+            if(other == null)
+            {
+                return false;
+            }
+            var result = other.m_UserId == m_UserId
+                          && other.m_Password == m_Password
+                          && other.m_DataSource == m_DataSource
+                          && other.m_SecurityType == m_SecurityType;
+            return result;
+        }
+
     }
 }
