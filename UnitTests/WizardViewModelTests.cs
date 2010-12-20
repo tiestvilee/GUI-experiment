@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using DowntoolsSvrExperiment.WizardControl;
 using NUnit.Framework;
-using Rhino.Mocks;
+using DowntoolsSvrExperiment.Utilities;
 
 namespace UnitTests
 {
@@ -34,15 +32,15 @@ namespace UnitTests
         public void ShouldRegisterListenersOnWizardControl()
         {
             Given();
-            Action cancelAction = () => { };
+            DowntoolsSvrExperiment.Utilities.Action cancelAction = () => { };
 
             When();
             var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, cancelAction);
 
             Then();
             Assert.That(m_View.CancelButtonAction, Is.EqualTo(cancelAction));
-            Assert.That(m_View.NextButtonAction, Is.EqualTo(new Action(wizardViewModel.MoveToNextPage)));
-            Assert.That(m_View.PreviousButtonAction, Is.EqualTo(new Action(wizardViewModel.MoveToPreviousPage)));
+            Assert.That(m_View.NextButtonAction, Is.EqualTo(new DowntoolsSvrExperiment.Utilities.Action(wizardViewModel.MoveToNextPage)));
+            Assert.That(m_View.PreviousButtonAction, Is.EqualTo(new DowntoolsSvrExperiment.Utilities.Action(wizardViewModel.MoveToPreviousPage)));
         }
 
         [Test]
@@ -99,6 +97,20 @@ namespace UnitTests
             Then();
             Assert.That(m_View.PageControl, Is.EqualTo(m_LastPageControl));
             Assert.That(m_View.PageName, Is.EqualTo("Step 2 of 2: Last Page"));
+        }
+
+        [Test]
+        public void ShouldTryToMoveToSecondPageButPostValidationFails()
+        {
+            Given();
+            var wizardViewModel = new WizardViewModel(m_View, m_FirstPage, null, null);
+            m_FirstPage.PostValidation = false;
+
+            When();
+            wizardViewModel.MoveToNextPage();
+
+            Then();
+            Assert.That(m_View.PageControl, Is.EqualTo(m_FirstPageControl));
         }
 
         [Test]
@@ -298,9 +310,9 @@ namespace UnitTests
         public string NextButtonName;
         public bool CancelButton;
         public List<PageNameAndCurrent> PageList;
-        public Action CancelButtonAction;
-        public Action NextButtonAction;
-        public Action PreviousButtonAction;
+        public DowntoolsSvrExperiment.Utilities.Action CancelButtonAction;
+        public DowntoolsSvrExperiment.Utilities.Action NextButtonAction;
+        public DowntoolsSvrExperiment.Utilities.Action PreviousButtonAction;
 
         public virtual void SetPage(UserControl pageControl, string pageName)
         {
@@ -333,17 +345,17 @@ namespace UnitTests
             PageList = pages;
         }
 
-        public void OnCancelDo(Action cancelAction)
+        public void OnCancelDo(DowntoolsSvrExperiment.Utilities.Action cancelAction)
         {
             CancelButtonAction = cancelAction;
         }
 
-        public void OnNextDo(Action nextButtonAction)
+        public void OnNextDo(DowntoolsSvrExperiment.Utilities.Action nextButtonAction)
         {
             NextButtonAction = nextButtonAction;
         }
 
-        public void OnPreviousDo(Action previousButtonAction)
+        public void OnPreviousDo(DowntoolsSvrExperiment.Utilities.Action previousButtonAction)
         {
             PreviousButtonAction = previousButtonAction;
         }
@@ -355,10 +367,11 @@ namespace UnitTests
         private readonly WizardPage m_Next;
         private readonly string m_NextButtonText;
         private bool m_ReadyToMove = true;
-        public Action OnChangeAction;
+        public DowntoolsSvrExperiment.Utilities.Action OnChangeAction;
         private string m_Name;
+        public bool PostValidation = true;
 
-        public StubbedPage(UserControl control, WizardPage next, string nextButtonText, string pageName)
+        public StubbedPage(UserControl control, WizardPage next, string nextButtonText, string pageName) : base(null)
         {
             m_Control = control;
             m_Next = next;
@@ -366,17 +379,17 @@ namespace UnitTests
             m_Name = pageName;
         }
 
-        public virtual UserControl GetControl()
+        public override UserControl GetControl()
         {
             return m_Control;
         }
 
-        public void OnChangeDo(Action onChangeAction)
+        public override void OnChangeDo(DowntoolsSvrExperiment.Utilities.Action onChangeAction)
         {
             OnChangeAction = onChangeAction;
         }
 
-        public virtual bool ReadyToMove()
+        public override bool ReadyToMove()
         {
             return m_ReadyToMove;
         }
@@ -386,19 +399,27 @@ namespace UnitTests
             m_ReadyToMove = value;
         }
 
-        public WizardPage GetNextPage()
+        public override WizardPage GetNextPage()
         {
             return m_Next;
         }
 
-        public string GetNextButtonText()
+        public override string GetNextButtonText()
         {
             return m_NextButtonText;
         }
 
-        public string getName()
+        public override string getName()
         {
             return m_Name;
+        }
+
+        public override void PostValidate(DowntoolsSvrExperiment.Utilities.Action andThen)
+        {
+            if(PostValidation)
+            {
+                andThen();
+            }
         }
 
         public void RaiseOnChangeDoAction()

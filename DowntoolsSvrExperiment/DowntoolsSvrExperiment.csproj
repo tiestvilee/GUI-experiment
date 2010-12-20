@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DowntoolsSvrExperiment</RootNamespace>
     <AssemblyName>DowntoolsSvrExperiment</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -34,18 +35,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RedGate.Shared.SQL">
+      <HintPath>..\lib\SharedUtils\Debug\RedGate.Shared.SQL.dll</HintPath>
+    </Reference>
+    <Reference Include="RedGate.Shared.Utils">
+      <HintPath>..\lib\SharedUtils\Debug\RedGate.Shared.Utils.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Connection\Connection.cs" />
+    <Compile Include="Connection\DbObjectName.cs" />
+    <Compile Include="Connection\TestConnection.cs" />
     <Compile Include="ExamplePageUserWidget.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -66,13 +73,16 @@
     <Compile Include="UserControl1.Designer.cs">
       <DependentUpon>UserControl1.cs</DependentUpon>
     </Compile>
-    <Compile Include="VRPages\IntroPage\IntroPage.cs" />
+    <Compile Include="Utilities\SystemForDotNet20.cs" />
+    <Compile Include="VRPages\IntroPage\IntroPageViewModel.cs" />
     <Compile Include="VRPages\IntroPage\IntroPageWidget.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="VRPages\IntroPage\IntroPageWidget.Designer.cs">
       <DependentUpon>IntroPageWidget.cs</DependentUpon>
     </Compile>
+    <Compile Include="VRPages\LocalServerPicker\LocalServerPickerPage.cs" />
+    <Compile Include="VRPages\LocalServerPicker\LocalServerPickerView.cs" />
     <Compile Include="WizardControl\ChangeListener.cs" />
     <Compile Include="WizardControl\WizardView.cs" />
     <Compile Include="WizardControl\Exceptions.cs" />
@@ -98,6 +108,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="VRPages\IntroPage\IntroPageWidget.resx">
       <DependentUpon>IntroPageWidget.cs</DependentUpon>
@@ -105,6 +116,7 @@
     <EmbeddedResource Include="WizardControl\WizardViewWidget.resx">
       <DependentUpon>WizardViewWidget.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -116,7 +128,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="VRPages\LocalServerPicker\" />
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

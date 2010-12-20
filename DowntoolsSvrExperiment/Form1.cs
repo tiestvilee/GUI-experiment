@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
+using DowntoolsSvrExperiment.Utilities;
 using DowntoolsSvrExperiment.VRPages.IntroPage;
 using DowntoolsSvrExperiment.WizardControl;
 
@@ -20,7 +15,7 @@ namespace DowntoolsSvrExperiment
             var wizardView = new WizardViewWidget();
             var secondPage = new PageExample(null, "second page");
             var firstPage = new PageExample(secondPage, "first page");
-            var introPage = new IntroPage(new IntroPageWidget(), firstPage);
+            var introPage = new IntroPageViewModel(new IntroPageWidget(), firstPage);
             new WizardViewModel(wizardView, introPage, cancel, cancel);
 
             Controls.Add(wizardView);
@@ -34,42 +29,40 @@ namespace DowntoolsSvrExperiment
 
     public class PageExample : WizardPage
     {
-        private readonly WizardPage m_NextPage;
         private readonly string m_PageName;
 
-        public PageExample(WizardPage nextPage, string pageName)
+        public PageExample(WizardPage nextPage, string pageName) : base(nextPage)
         {
-            m_NextPage = nextPage;
             m_PageName = pageName;
         }
 
-        public UserControl GetControl()
+        public override UserControl GetControl()
         {
             return new ExamplePageUserWidget();
         }
 
-        public void OnChangeDo(Action onChangeAction)
+        public override void OnChangeDo(Action onChangeAction)
         {
         }
 
-        public bool ReadyToMove()
+        public override bool ReadyToMove()
         {
             return true;
         }
 
-        public WizardPage GetNextPage()
-        {
-            return m_NextPage;
-        }
-
-        public string GetNextButtonText()
+        public override string GetNextButtonText()
         {
             return "Next";
         }
 
-        public string getName()
+        public override string getName()
         {
             return m_PageName;
+        }
+
+        public override void PostValidate(Action andThen)
+        {
+            throw new NotImplementedException();
         }
     }
 

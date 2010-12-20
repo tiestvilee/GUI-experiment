@@ -1,18 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
+using DowntoolsSvrExperiment.Utilities;
 
 namespace DowntoolsSvrExperiment.WizardControl
 {
-    public interface WizardPage
+    public abstract class WizardPage
     {
-        UserControl GetControl();
-        void OnChangeDo(Action onChangeAction);
-        bool ReadyToMove();
-        WizardPage GetNextPage();
-        string GetNextButtonText();
-        string getName();
+        private readonly WizardPage m_NextPage;
+
+        public WizardPage(WizardPage nextPage)
+        {
+            m_NextPage = nextPage;
+        }
+
+
+        public virtual WizardPage GetNextPage()
+        {
+            return m_NextPage;
+        }
+
+        public virtual string GetNextButtonText()
+        {
+            return "Next";
+        }
+
+        public abstract UserControl GetControl();
+        public abstract void OnChangeDo(Action onChangeAction);
+        public abstract bool ReadyToMove();
+        public abstract string getName();
+
+        public abstract void PostValidate(Action andThen);
     }
 }

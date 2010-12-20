@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using DowntoolsSvrExperiment.Utilities;
 
 namespace DowntoolsSvrExperiment.WizardControl
 {
@@ -35,6 +34,11 @@ namespace DowntoolsSvrExperiment.WizardControl
                 throw new NotReadyToProceedException();
             }
 
+            m_CurrentPage.PostValidate(CompleteMoveToNextPage);
+        }
+
+        private void CompleteMoveToNextPage()
+        {
             if (m_CurrentPage.GetNextPage() == null)
             {
                 m_FinishAction.Invoke();
