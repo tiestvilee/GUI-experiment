@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
+using DowntoolsSvrExperiment.Connection;
 using DowntoolsSvrExperiment.Utilities;
 using DowntoolsSvrExperiment.VRPages.IntroPage;
+using DowntoolsSvrExperiment.VRPages.LocalServerPicker;
 using DowntoolsSvrExperiment.WizardControl;
 
 namespace DowntoolsSvrExperiment
@@ -15,7 +17,9 @@ namespace DowntoolsSvrExperiment
             var wizardView = new WizardViewWidget();
             var secondPage = new PageExample(null, "second page");
             var firstPage = new PageExample(secondPage, "first page");
-            var introPage = new IntroPageViewModel(new IntroPageWidget(), firstPage);
+            var localInstancePage = new LocalServerPickerPage(new LocalServerPickerWidget(), firstPage,
+                                                              new TestConnection(), new GetLocalInstances());
+            var introPage = new IntroPageViewModel(new IntroPageWidget(), localInstancePage);
             new WizardViewModel(wizardView, introPage, cancel, cancel);
 
             Controls.Add(wizardView);

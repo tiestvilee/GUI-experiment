@@ -86,6 +86,12 @@
     </Compile>
     <Compile Include="VRPages\LocalServerPicker\LocalServerPickerPage.cs" />
     <Compile Include="VRPages\LocalServerPicker\LocalServerPickerView.cs" />
+    <Compile Include="VRPages\LocalServerPicker\LocalServerPickerWidget.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VRPages\LocalServerPicker\LocalServerPickerWidget.Designer.cs">
+      <DependentUpon>LocalServerPickerWidget.cs</DependentUpon>
+    </Compile>
     <Compile Include="WizardControl\ChangeListener.cs" />
     <Compile Include="WizardControl\WizardView.cs" />
     <Compile Include="WizardControl\Exceptions.cs" />
@@ -115,6 +121,9 @@
     </Compile>
     <EmbeddedResource Include="VRPages\IntroPage\IntroPageWidget.resx">
       <DependentUpon>IntroPageWidget.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VRPages\LocalServerPicker\LocalServerPickerWidget.resx">
+      <DependentUpon>LocalServerPickerWidget.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WizardControl\WizardViewWidget.resx">
       <DependentUpon>WizardViewWidget.cs</DependentUpon>

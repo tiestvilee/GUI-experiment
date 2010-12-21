@@ -47,7 +47,7 @@ namespace UnitTests
             var localServerPickerPage = new LocalServerPickerPage(view, nextPage, null, m_GetLocalInstances);
 
             Then();
-            Assert.That(m_DefaultView.FormEnabled, Is.True);
+            Assert.That(view.FormEnabled, Is.EqualTo(EnabledState.Integrated));
             Assert.That(localServerPickerPage.GetControl(), Is.EqualTo(widget));
             Assert.That(localServerPickerPage.GetNextPage(), Is.EqualTo(nextPage));
         }
@@ -62,6 +62,36 @@ namespace UnitTests
 
             Then();
             Assert.That(localServerPickerPage.getName(), Is.EqualTo("Choose Local Server"));
+        }
+
+        [Test]
+        public void ShouldChangeEnabledStateWhenAuthStateChanges()
+        {
+            Given();
+
+            When();
+            new LocalServerPickerPage(m_DefaultView, null, null, m_GetLocalInstances);
+            m_DefaultView.SecurityType(SecurityType.SqlServerAuth);
+            m_DefaultView.SecurityTypeChangeAction();
+
+            Then();
+            Assert.That(m_DefaultView.FormEnabled, Is.EqualTo(EnabledState.SqlServerAuth));
+        }
+
+        [Test]
+        public void ShouldChangeEnabledStateWhenIntegratedAuthChosen()
+        {
+            Given();
+
+            When();
+            new LocalServerPickerPage(m_DefaultView, null, null, m_GetLocalInstances);
+            m_DefaultView.SecurityType(SecurityType.SqlServerAuth);
+            m_DefaultView.SecurityTypeChangeAction();
+            m_DefaultView.SecurityType(SecurityType.Integrated);
+            m_DefaultView.SecurityTypeChangeAction();
+
+            Then();
+            Assert.That(m_DefaultView.FormEnabled, Is.EqualTo(EnabledState.Integrated));
         }
 
         [Test]
@@ -181,7 +211,7 @@ namespace UnitTests
 
             Then();
             Assert.That(postValidateCalled, Is.False);
-            Assert.That(m_DefaultView.FormEnabled, Is.True);
+            Assert.That(m_DefaultView.FormEnabled, Is.EqualTo(EnabledState.Integrated));
             Assert.That(m_DefaultView.WarningText, Is.EqualTo(m_FailingConnectionStatus.ErrorMessage));
         }
 
@@ -213,7 +243,7 @@ namespace UnitTests
 
             Then();
             Assert.That(m_DefaultView.Instances, Is.Null);
-            Assert.That(m_DefaultView.FormEnabled, Is.False);
+            Assert.That(m_DefaultView.FormEnabled, Is.EqualTo(EnabledState.Disabled));
             Assert.That(m_DefaultView.WarningText, Is.EqualTo("There are no local SQL Server instances on this computer.  " +
                 "Try running the SQL Virtual Restore Wizard on a computer that has a SQL Server instance installed."));
         }
@@ -239,8 +269,10 @@ namespace UnitTests
         private string m_UserName;
 
         public IEnumerable<string> Instances;
-        public bool FormEnabled = true;
+        public EnabledState FormEnabled = EnabledState.Disabled;
         public string WarningText;
+
+        public DowntoolsSvrExperiment.Utilities.Action SecurityTypeChangeAction;
 
         public StubbedLocalServerPickerView(UserControl control)
         {
@@ -282,9 +314,14 @@ namespace UnitTests
             WarningText = errorMessage;
         }
 
-        public void SetFormEnabled(bool enabled)
+        public void SetFormEnabledState(EnabledState enabled)
         {
             FormEnabled = enabled;
+        }
+
+        public void OnSecurityTypeChange(DowntoolsSvrExperiment.Utilities.Action doThis)
+        {
+            SecurityTypeChangeAction = doThis;
         }
 
         public StubbedLocalServerPickerView Instance(string instance)

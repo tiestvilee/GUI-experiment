@@ -15,7 +15,20 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
         {
             m_View = view;
             m_TestConnection = testConnection;
+            m_View.SetFormEnabledState(EnabledState.Integrated);
             UpdateViewWithLocalInstances(getLocalInstances);
+            view.OnSecurityTypeChange(UpdateSecurityTypeOnView);
+        }
+
+        private void UpdateSecurityTypeOnView()
+        {
+            if(m_View.GetSecurityType() == SecurityType.Integrated)
+            {
+                m_View.SetFormEnabledState(EnabledState.Integrated);
+            } else if(m_View.GetSecurityType() == SecurityType.SqlServerAuth)
+            {
+                m_View.SetFormEnabledState(EnabledState.SqlServerAuth);
+            }
         }
 
         private void UpdateViewWithLocalInstances(GetLocalInstances getLocalInstances)
@@ -26,7 +39,7 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
                 m_View.SetLocalInstances(localInstances);
             } else
             {
-                m_View.SetFormEnabled(false);
+                m_View.SetFormEnabledState(EnabledState.Disabled);
                 m_View.ShowWarning("There are no local SQL Server instances on this computer.  Try running the SQL Virtual Restore Wizard on a computer that has a SQL Server instance installed.");
             }
         }
@@ -38,7 +51,7 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
 
         public override void OnChangeDo(Action onChangeAction)
         {
-            throw new NotImplementedException();
+            m_OnChangeAction = onChangeAction;
         }
 
         public override bool ReadyToMove()

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
+using DowntoolsSvrExperiment.Utilities;
 
 namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
 {
@@ -12,11 +13,17 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
         string GetPassword();
         void SetLocalInstances(IEnumerable<string> localInstances);
         void ShowWarning(string warningMessage);
-        void SetFormEnabled(bool enabled);
+        void SetFormEnabledState(EnabledState enabled);
+        void OnSecurityTypeChange(Action doThis);
     }
 
     public enum SecurityType
     {
         Integrated, SqlServerAuth
+    }
+
+    public enum EnabledState
+    {
+        Integrated, SqlServerAuth, Disabled
     }
 }
