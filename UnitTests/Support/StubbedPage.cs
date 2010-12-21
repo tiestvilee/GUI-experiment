@@ -1,7 +1,7 @@
 ﻿using System.Windows.Forms;
 using DowntoolsSvrExperiment.WizardControl;
 
-namespace UnitTests
+namespace UnitTests.Support
 {
     public class StubbedPage : WizardPage
     {

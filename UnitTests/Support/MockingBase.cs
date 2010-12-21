@@ -1,6 +1,6 @@
 ﻿using Rhino.Mocks;
 
-namespace UnitTests
+namespace UnitTests.Support
 {
     public class MockingBase
     {

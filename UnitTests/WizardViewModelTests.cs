@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using DowntoolsSvrExperiment.WizardControl;
 using NUnit.Framework;
-using DowntoolsSvrExperiment.Utilities;
+using UnitTests.Support;
 
 namespace UnitTests
 {

@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Connection\Connection.cs" />
     <Compile Include="Connection\DbObjectName.cs" />
+    <Compile Include="Connection\GetLocalInstances.cs" />
     <Compile Include="Connection\TestConnection.cs" />
     <Compile Include="ExamplePageUserWidget.cs">
       <SubType>UserControl</SubType>
@@ -74,6 +75,8 @@
       <DependentUpon>UserControl1.cs</DependentUpon>
     </Compile>
     <Compile Include="Utilities\SystemForDotNet20.cs" />
+    <Compile Include="Utilities\SystemInfo.cs" />
+    <Compile Include="Utilities\Win32.cs" />
     <Compile Include="VRPages\IntroPage\IntroPageViewModel.cs" />
     <Compile Include="VRPages\IntroPage\IntroPageWidget.cs">
       <SubType>UserControl</SubType>

@@ -11,10 +11,24 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
         private readonly LocalServerPickerView m_View;
         private readonly TestConnection m_TestConnection;
 
-        public LocalServerPickerPage(LocalServerPickerView view, WizardPage nextPage, TestConnection testConnection) : base(nextPage)
+        public LocalServerPickerPage(LocalServerPickerView view, WizardPage nextPage, TestConnection testConnection, GetLocalInstances getLocalInstances) : base(nextPage)
         {
             m_View = view;
             m_TestConnection = testConnection;
+            UpdateViewWithLocalInstances(getLocalInstances);
+        }
+
+        private void UpdateViewWithLocalInstances(GetLocalInstances getLocalInstances)
+        {
+            var localInstances = getLocalInstances.LocalInstances();
+            if(localInstances.GetEnumerator().MoveNext())
+            {
+                m_View.SetLocalInstances(localInstances);
+            } else
+            {
+                m_View.SetFormEnabled(false);
+                m_View.ShowWarning("There are no local SQL Server instances on this computer.  Try running the SQL Virtual Restore Wizard on a computer that has a SQL Server instance installed.");
+            }
         }
 
         public override UserControl GetControl()
@@ -61,6 +75,9 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
             if(status.Connected)
             {
                 andThen();
+            } else
+            {
+                m_View.ShowWarning(status.ErrorMessage);
             }
         }
     }

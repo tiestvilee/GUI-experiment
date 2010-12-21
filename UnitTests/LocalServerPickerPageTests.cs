@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using DowntoolsSvrExperiment.Connection;
-using DowntoolsSvrExperiment.Utilities;
 using DowntoolsSvrExperiment.VRPages.LocalServerPicker;
-using DowntoolsSvrExperiment.WizardControl;
 using NUnit.Framework;
 using Rhino.Mocks;
+using UnitTests.Support;
 
 namespace UnitTests
 {
@@ -16,8 +15,9 @@ namespace UnitTests
         private TestConnection m_TestConnection;
         private ConnectionStatus m_PassingConnectionStatus;
         private ConnectionStatus m_FailingConnectionStatus;
-        private LocalServerPickerView m_DefaultView;
+        private StubbedLocalServerPickerView m_DefaultView;
         private Connection m_DefaultConnection;
+        private GetLocalInstances m_GetLocalInstances;
 
         [SetUp]
         public void SetUp()
@@ -32,20 +32,22 @@ namespace UnitTests
                 .Password("rocks!");
 
             m_DefaultConnection = new Connection("instance", SecurityType.SqlServerAuth, "tiestv", "rocks!");
+            m_GetLocalInstances = m_Mocks.PartialMock<StubbedGetLocalInstances>();
         }
 
         [Test]
-        public void ShouldReturnWidgetAndNextPage()
+        public void ShouldReturnWidgetAndNextPageAndFormIsEnabled()
         {
-            // Given
+            Given();
             var widget = new UserControl();
             var view = new StubbedLocalServerPickerView(widget);
             var nextPage = new StubbedPage(null, null, null, null);
 
-            // When
-            var localServerPickerPage = new LocalServerPickerPage(view, nextPage, null);
+            When();
+            var localServerPickerPage = new LocalServerPickerPage(view, nextPage, null, m_GetLocalInstances);
 
-            // Then
+            Then();
+            Assert.That(m_DefaultView.FormEnabled, Is.True);
             Assert.That(localServerPickerPage.GetControl(), Is.EqualTo(widget));
             Assert.That(localServerPickerPage.GetNextPage(), Is.EqualTo(nextPage));
         }
@@ -53,48 +55,51 @@ namespace UnitTests
         [Test]
         public void ShouldReturnCorrectName()
         {
-            var localServerPickerPage = new LocalServerPickerPage(null, null, null);
+            Given();
+
+            When();
+            var localServerPickerPage = new LocalServerPickerPage(m_DefaultView, null, null, m_GetLocalInstances);
+
+            Then();
             Assert.That(localServerPickerPage.getName(), Is.EqualTo("Choose Local Server"));
         }
 
         [Test]
         public void NotReadyToMoveIfInstanceNotSelected()
         {
-            // Given
+            Given();
             var view = new StubbedLocalServerPickerView(null)
                 .Instance(null);
 
 
-            var localServerPickerPage = new LocalServerPickerPage(view, null, null);
-
-            // When
+            When();
+            var localServerPickerPage = new LocalServerPickerPage(view, null, null, m_GetLocalInstances);
             var readyToMove = localServerPickerPage.ReadyToMove();
 
-            // Then
+            Then();
             Assert.That(readyToMove, Is.False);
         }
 
         [Test]
         public void ReadyToMoveIfInstanceSelectedAndUsingIntegratedSecurity()
         {
-            // Given
+            Given();
             var view = new StubbedLocalServerPickerView(null)
                 .Instance("something");
             view.SecurityType(SecurityType.Integrated);
 
-            var localServerPickerPage = new LocalServerPickerPage(view, null, null);
-
-            // When
+            When();
+            var localServerPickerPage = new LocalServerPickerPage(view, null, null, m_GetLocalInstances);
             var readyToMove = localServerPickerPage.ReadyToMove();
 
-            // Then
+            Then();
             Assert.That(readyToMove, Is.True);
         }
 
         [Test]
         public void ReadyToMoveIfInstanceSelectedUsingSqlAuthAndUserPasswordProvided()
         {
-            // Given
+            Given();
             var view = 
                 new StubbedLocalServerPickerView(null)
                     .Instance("soemthingelse")
@@ -102,31 +107,29 @@ namespace UnitTests
                     .UserName("tiest")
                     .Password("rocks");
 
-            var localServerPickerPage = new LocalServerPickerPage(view, null, null);
-
-            // When
+            When();
+            var localServerPickerPage = new LocalServerPickerPage(view, null, null, m_GetLocalInstances);
             var readyToMove = localServerPickerPage.ReadyToMove();
 
-            // Then
+            Then();
             Assert.That(readyToMove, Is.True);
         }
 
         [Test]
         public void NotReadyToMoveIfUsernameNotSupplied()
         {
-            // Given
+            Given();
             var view =
                 new StubbedLocalServerPickerView(null)
                     .Instance("soemthingelseelse")
                     .SecurityType(SecurityType.SqlServerAuth)
                     .Password("rocks");
 
-            var localServerPickerPage = new LocalServerPickerPage(view, null, null);
-
-            // When
+            When();
+            var localServerPickerPage = new LocalServerPickerPage(view, null, null, m_GetLocalInstances);
             var readyToMove = localServerPickerPage.ReadyToMove();
 
-            // Then
+            Then();
             Assert.That(readyToMove, Is.False);
         }
 
@@ -139,11 +142,11 @@ namespace UnitTests
                 m_DefaultView.GetSecurityType(), 
                 m_DefaultView.GetUserName(), 
                 m_DefaultView.GetPassword());
-            var localServerPickerPage = new LocalServerPickerPage(m_DefaultView, null, m_TestConnection);
             Expect.Call(m_TestConnection.Test(connection)).Return(m_PassingConnectionStatus);
 
             When();
-            localServerPickerPage.PostValidate(() => {});
+            var localServerPickerPage = new LocalServerPickerPage(m_DefaultView, null, m_TestConnection, m_GetLocalInstances);
+            localServerPickerPage.PostValidate(() => { });
 
             Then();
         }
@@ -153,11 +156,11 @@ namespace UnitTests
         {
             Given();
             var postValidateCalled = false;
-            var localServerPickerPage = new LocalServerPickerPage(m_DefaultView, null, m_TestConnection);
 
             Expect.Call(m_TestConnection.Test(m_DefaultConnection)).Return(m_PassingConnectionStatus);
 
             When();
+            var localServerPickerPage = new LocalServerPickerPage(m_DefaultView, null, m_TestConnection, m_GetLocalInstances);
             localServerPickerPage.PostValidate(() => { postValidateCalled = true; });
 
             Then();
@@ -165,22 +168,66 @@ namespace UnitTests
         }
 
         [Test]
-        public void FailsPostValidationIfConnectionFails()
+        public void FailsPostValidationIfConnectionFailsAndProvidesWarningToUser()
         {
             Given();
             var postValidateCalled = false;
-            var localServerPickerPage = new LocalServerPickerPage(m_DefaultView, null, m_TestConnection);
 
             Expect.Call(m_TestConnection.Test(m_DefaultConnection)).Return(m_FailingConnectionStatus);
 
             When();
+            var localServerPickerPage = new LocalServerPickerPage(m_DefaultView, null, m_TestConnection, m_GetLocalInstances);
             localServerPickerPage.PostValidate(() => { postValidateCalled = true; });
 
             Then();
             Assert.That(postValidateCalled, Is.False);
+            Assert.That(m_DefaultView.FormEnabled, Is.True);
+            Assert.That(m_DefaultView.WarningText, Is.EqualTo(m_FailingConnectionStatus.ErrorMessage));
         }
 
+        [Test]
+        public void ShouldProvideListOfInstancesToView()
+        {
+            Given();
+            var expectedInstances = new List<string>();
+            expectedInstances.Add("(local)");
+            expectedInstances.Add("SQL2008");
+            Expect.Call(m_GetLocalInstances.LocalInstances()).Return(expectedInstances);
 
+            When();
+            new LocalServerPickerPage(m_DefaultView, null, null, m_GetLocalInstances);
+            
+            Then();
+            Assert.That(m_DefaultView.Instances, Is.EqualTo(expectedInstances));
+        }
+
+        [Test]
+        public void ShouldWarnUserWhenNoLocalInstancesAvailableAndDisableForm()
+        {
+            Given();
+            var emptyInstances = new List<string>();
+            Expect.Call(m_GetLocalInstances.LocalInstances()).Return(emptyInstances);
+
+            When();
+            new LocalServerPickerPage(m_DefaultView, null, null, m_GetLocalInstances);
+
+            Then();
+            Assert.That(m_DefaultView.Instances, Is.Null);
+            Assert.That(m_DefaultView.FormEnabled, Is.False);
+            Assert.That(m_DefaultView.WarningText, Is.EqualTo("There are no local SQL Server instances on this computer.  " +
+                "Try running the SQL Virtual Restore Wizard on a computer that has a SQL Server instance installed."));
+        }
+
+    }
+
+    public class StubbedGetLocalInstances : GetLocalInstances
+    {
+        public override IEnumerable<string> LocalInstances()
+        {
+            var localInstances = new List<string>();
+            localInstances.Add("(local)");
+            return localInstances;
+        }
     }
 
     class StubbedLocalServerPickerView : LocalServerPickerView
@@ -190,6 +237,10 @@ namespace UnitTests
         private SecurityType m_SecurityType;
         private string m_Password;
         private string m_UserName;
+
+        public IEnumerable<string> Instances;
+        public bool FormEnabled = true;
+        public string WarningText;
 
         public StubbedLocalServerPickerView(UserControl control)
         {
@@ -219,6 +270,21 @@ namespace UnitTests
         public string GetPassword()
         {
             return m_Password;
+        }
+
+        public void SetLocalInstances(IEnumerable<string> localInstances)
+        {
+            Instances = localInstances;
+        }
+
+        public void ShowWarning(string errorMessage)
+        {
+            WarningText = errorMessage;
+        }
+
+        public void SetFormEnabled(bool enabled)
+        {
+            FormEnabled = enabled;
         }
 
         public StubbedLocalServerPickerView Instance(string instance)
