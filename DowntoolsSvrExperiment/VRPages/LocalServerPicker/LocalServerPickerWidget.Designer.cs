@@ -32,7 +32,7 @@
             this.m_Instances = new System.Windows.Forms.ComboBox();
             this.m_WindowsAuth = new System.Windows.Forms.RadioButton();
             this.m_SqlServerAuth = new System.Windows.Forms.RadioButton();
-            this.label1 = new System.Windows.Forms.Label();
+            this.m_InstanceLabel = new System.Windows.Forms.Label();
             this.m_UserName = new System.Windows.Forms.TextBox();
             this.m_Password = new System.Windows.Forms.TextBox();
             this.m_UserNameLabel = new System.Windows.Forms.Label();
@@ -50,6 +50,7 @@
             this.m_Instances.Name = "m_Instances";
             this.m_Instances.Size = new System.Drawing.Size(179, 21);
             this.m_Instances.TabIndex = 0;
+            this.m_Instances.SelectedIndexChanged += new System.EventHandler(this.m_Instances_SelectedIndexChanged);
             // 
             // m_WindowsAuth
             // 
@@ -62,6 +63,7 @@
             this.m_WindowsAuth.TabStop = true;
             this.m_WindowsAuth.Text = "Windows authentication";
             this.m_WindowsAuth.UseVisualStyleBackColor = true;
+            this.m_WindowsAuth.CheckedChanged += new System.EventHandler(this.m_WindowsAuth_CheckedChanged);
             // 
             // m_SqlServerAuth
             // 
@@ -72,15 +74,16 @@
             this.m_SqlServerAuth.TabIndex = 2;
             this.m_SqlServerAuth.Text = "SQL Server Authentication";
             this.m_SqlServerAuth.UseVisualStyleBackColor = true;
+            this.m_SqlServerAuth.CheckedChanged += new System.EventHandler(this.m_SqlServerAuth_CheckedChanged);
             // 
-            // label1
+            // m_InstanceLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(79, 103);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(51, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "&Instance:";
+            this.m_InstanceLabel.AutoSize = true;
+            this.m_InstanceLabel.Location = new System.Drawing.Point(79, 103);
+            this.m_InstanceLabel.Name = "m_InstanceLabel";
+            this.m_InstanceLabel.Size = new System.Drawing.Size(51, 13);
+            this.m_InstanceLabel.TabIndex = 3;
+            this.m_InstanceLabel.Text = "&Instance:";
             // 
             // m_UserName
             // 
@@ -89,6 +92,7 @@
             this.m_UserName.Name = "m_UserName";
             this.m_UserName.Size = new System.Drawing.Size(179, 20);
             this.m_UserName.TabIndex = 4;
+            this.m_UserName.TextChanged += new System.EventHandler(this.m_UserName_TextChanged);
             // 
             // m_Password
             // 
@@ -97,6 +101,7 @@
             this.m_Password.Name = "m_Password";
             this.m_Password.Size = new System.Drawing.Size(179, 20);
             this.m_Password.TabIndex = 5;
+            this.m_Password.TextChanged += new System.EventHandler(this.m_Password_TextChanged);
             // 
             // m_UserNameLabel
             // 
@@ -144,7 +149,7 @@
             this.Controls.Add(this.m_UserNameLabel);
             this.Controls.Add(this.m_Password);
             this.Controls.Add(this.m_UserName);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.m_InstanceLabel);
             this.Controls.Add(this.m_SqlServerAuth);
             this.Controls.Add(this.m_WindowsAuth);
             this.Controls.Add(this.m_Instances);
@@ -161,7 +166,7 @@
         private System.Windows.Forms.ComboBox m_Instances;
         private System.Windows.Forms.RadioButton m_WindowsAuth;
         private System.Windows.Forms.RadioButton m_SqlServerAuth;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label m_InstanceLabel;
         private System.Windows.Forms.TextBox m_UserName;
         private System.Windows.Forms.TextBox m_Password;
         private System.Windows.Forms.Label m_UserNameLabel;

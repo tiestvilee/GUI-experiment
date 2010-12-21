@@ -11,7 +11,7 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
 {
     public partial class LocalServerPickerWidget : UserControl, LocalServerPickerView
     {
-        private Action m_SecurityTypeChangeAction;
+        private Action m_OnChangeAction;
 
         public LocalServerPickerWidget()
         {
@@ -25,7 +25,12 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
 
         public string GetInstance()
         {
-            return m_Instances.SelectedText;
+            var selectedIndex = m_Instances.SelectedIndex;
+            if(selectedIndex > -1)
+            {
+                return (string)m_Instances.Items[selectedIndex];
+            }
+            return "";
         }
 
         public SecurityType GetSecurityType()
@@ -66,20 +71,64 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
             switch (enabled)
             {
                 case EnabledState.Integrated:
-                    m_Instances.Enabled = true;
+                    EnableInstances(true);
+                    EnableUserPassword(false);
                     break;
                 case EnabledState.SqlServerAuth:
-                    m_Instances.Enabled = true;
+                    EnableInstances(true);
+                    EnableUserPassword(true);
                     break;
                 case EnabledState.Disabled:
-                    m_Instances.Enabled = false;
+                    EnableInstances(false);
+                    EnableUserPassword(false);
                     break;
             }
         }
 
-        public void OnSecurityTypeChange(Action doThis)
+        private void EnableInstances(bool enabled)
         {
-            m_SecurityTypeChangeAction = doThis;
+            m_InstanceLabel.Enabled = enabled;
+            m_Instances.Enabled = enabled;
+            m_WindowsAuth.Enabled = enabled;
+            m_SqlServerAuth.Enabled = enabled;
+        }
+
+        private void EnableUserPassword(bool enabled)
+        {
+            m_PasswordLabel.Enabled = enabled;
+            m_Password.Enabled = enabled;
+            m_UserNameLabel.Enabled = enabled;
+            m_UserName.Enabled = enabled;
+        }
+
+        public void OnChange(Action onChangeAction)
+        {
+            m_OnChangeAction = onChangeAction;
+        }
+
+        private void m_WindowsAuth_CheckedChanged(object sender, EventArgs e)
+        {
+            m_OnChangeAction();
+        }
+
+        private void m_SqlServerAuth_CheckedChanged(object sender, EventArgs e)
+        {
+            m_OnChangeAction();
+        }
+
+        private void m_Instances_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            m_OnChangeAction();
+        }
+
+        private void m_UserName_TextChanged(object sender, EventArgs e)
+        {
+            m_OnChangeAction();
+        }
+
+        private void m_Password_TextChanged(object sender, EventArgs e)
+        {
+            m_OnChangeAction();
         }
     }
 }

@@ -10,6 +10,7 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
     {
         private readonly LocalServerPickerView m_View;
         private readonly TestConnection m_TestConnection;
+        private Action m_OnChangeAction;
 
         public LocalServerPickerPage(LocalServerPickerView view, WizardPage nextPage, TestConnection testConnection, GetLocalInstances getLocalInstances) : base(nextPage)
         {
@@ -17,18 +18,21 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
             m_TestConnection = testConnection;
             m_View.SetFormEnabledState(EnabledState.Integrated);
             UpdateViewWithLocalInstances(getLocalInstances);
-            view.OnSecurityTypeChange(UpdateSecurityTypeOnView);
+            view.OnChange(OnChangeAction);
         }
 
-        private void UpdateSecurityTypeOnView()
+        private void OnChangeAction()
         {
-            if(m_View.GetSecurityType() == SecurityType.Integrated)
+            if (m_View.GetSecurityType() == SecurityType.Integrated)
             {
                 m_View.SetFormEnabledState(EnabledState.Integrated);
-            } else if(m_View.GetSecurityType() == SecurityType.SqlServerAuth)
+            }
+            else if (m_View.GetSecurityType() == SecurityType.SqlServerAuth)
             {
                 m_View.SetFormEnabledState(EnabledState.SqlServerAuth);
             }
+
+            m_OnChangeAction();
         }
 
         private void UpdateViewWithLocalInstances(GetLocalInstances getLocalInstances)

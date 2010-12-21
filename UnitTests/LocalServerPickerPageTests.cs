@@ -6,6 +6,7 @@ using DowntoolsSvrExperiment.VRPages.LocalServerPicker;
 using NUnit.Framework;
 using Rhino.Mocks;
 using UnitTests.Support;
+using Action = DowntoolsSvrExperiment.Utilities.Action;
 
 namespace UnitTests
 {
@@ -36,7 +37,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void ShouldReturnWidgetAndNextPageAndFormIsEnabled()
+        public void ShouldReturnWidgetAndNextPageAndFormIsEnabledAndRegisterForEvents()
         {
             Given();
             var widget = new UserControl();
@@ -48,6 +49,7 @@ namespace UnitTests
 
             Then();
             Assert.That(view.FormEnabled, Is.EqualTo(EnabledState.Integrated));
+            Assert.That(view.OnChangeAction, Is.Not.Null);
             Assert.That(localServerPickerPage.GetControl(), Is.EqualTo(widget));
             Assert.That(localServerPickerPage.GetNextPage(), Is.EqualTo(nextPage));
         }
@@ -65,30 +67,38 @@ namespace UnitTests
         }
 
         [Test]
+        public void ShouldCallOnChangeEventWhenSomethingChanges()
+        {
+            Given();
+            var actionCalled = false;
+
+            When();
+            new LocalServerPickerPage(m_DefaultView, null, null, m_GetLocalInstances)
+                .OnChangeDo(() => { actionCalled = true; });
+            m_DefaultView.OnChangeAction();
+
+            Then();
+            Assert.That(actionCalled, Is.True);
+        }
+
+        [Test]
         public void ShouldChangeEnabledStateWhenAuthStateChanges()
         {
             Given();
 
             When();
-            new LocalServerPickerPage(m_DefaultView, null, null, m_GetLocalInstances);
+            new LocalServerPickerPage(m_DefaultView, null, null, m_GetLocalInstances)
+                .OnChangeDo(() => { });
+
             m_DefaultView.SecurityType(SecurityType.SqlServerAuth);
-            m_DefaultView.SecurityTypeChangeAction();
+            m_DefaultView.OnChangeAction();
 
             Then();
             Assert.That(m_DefaultView.FormEnabled, Is.EqualTo(EnabledState.SqlServerAuth));
-        }
-
-        [Test]
-        public void ShouldChangeEnabledStateWhenIntegratedAuthChosen()
-        {
-            Given();
 
             When();
-            new LocalServerPickerPage(m_DefaultView, null, null, m_GetLocalInstances);
-            m_DefaultView.SecurityType(SecurityType.SqlServerAuth);
-            m_DefaultView.SecurityTypeChangeAction();
             m_DefaultView.SecurityType(SecurityType.Integrated);
-            m_DefaultView.SecurityTypeChangeAction();
+            m_DefaultView.OnChangeAction();
 
             Then();
             Assert.That(m_DefaultView.FormEnabled, Is.EqualTo(EnabledState.Integrated));
@@ -272,7 +282,7 @@ namespace UnitTests
         public EnabledState FormEnabled = EnabledState.Disabled;
         public string WarningText;
 
-        public DowntoolsSvrExperiment.Utilities.Action SecurityTypeChangeAction;
+        public DowntoolsSvrExperiment.Utilities.Action OnChangeAction;
 
         public StubbedLocalServerPickerView(UserControl control)
         {
@@ -319,9 +329,9 @@ namespace UnitTests
             FormEnabled = enabled;
         }
 
-        public void OnSecurityTypeChange(DowntoolsSvrExperiment.Utilities.Action doThis)
+        public void OnChange(Action onChangeAction)
         {
-            SecurityTypeChangeAction = doThis;
+            OnChangeAction = onChangeAction;
         }
 
         public StubbedLocalServerPickerView Instance(string instance)

@@ -14,7 +14,7 @@ namespace DowntoolsSvrExperiment.VRPages.LocalServerPicker
         void SetLocalInstances(IEnumerable<string> localInstances);
         void ShowWarning(string warningMessage);
         void SetFormEnabledState(EnabledState enabled);
-        void OnSecurityTypeChange(Action doThis);
+        void OnChange(Action onChangeAction);
     }
 
     public enum SecurityType
